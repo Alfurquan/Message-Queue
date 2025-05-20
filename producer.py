@@ -15,8 +15,8 @@ class Producer:
     def disconnect(self):
         self.sock.close()
 
-    def publish(self, topic, message):
-        request = {'action': 'publish', 'topic': topic, 'message': message}
+    def publish(self, topics, message):
+        request = {'action': 'publish', 'topics': topics, 'message': message}
         self.sock.sendall(json.dumps(request).encode('utf-8'))
         data = self.sock.recv(4096)
         if not data:
@@ -28,14 +28,15 @@ def main():
     port_config = get_port_config()
     producer = Producer(port=port_config['port'], host=port_config['host'])
     producer.connect()
-    logger = ConsoleLogger(name="producer").get_logger()
-    topic = input("Enter topic to publish to: ")
+    
+    
     while True:
-        msg = input("Enter message (or 'exit'): ")
-        if msg.lower() == 'exit':
+        topics = input("Enter topics (comma separated) to publish to: ")
+        msg = input("Enter message: ")
+        producer.publish(topics, msg) 
+        cont = input("Do you want to continue? (y/n): ").strip().lower()
+        if cont != 'y':
             break
-        producer.publish(topic, msg)
-        logger.info(f"Message published to topic {topic}: {msg}")
 
 if __name__ == "__main__":
     main()
