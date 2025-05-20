@@ -7,8 +7,9 @@ class Logger(ABC):
     """
     Abstract base class for logging.
     """
-    def __init__(self, name: str, config: dict = get_log_config()):
+    def __init__(self, name: str):
         self.logger = logging.getLogger(name)
+        config = get_log_config()
         self.logger.setLevel(config.get("log_level"))
         self.logger.propagate = False
 
