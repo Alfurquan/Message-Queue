@@ -21,19 +21,23 @@ class Producer:
         data = self.sock.recv(4096)
         if not data:
             return None
-        response = json.loads(data.decode('utf-8'))
-        return response.get('status')
+        return json.loads(data.decode('utf-8'))
 
 def main():
     port_config = get_port_config()
     producer = Producer(port=port_config['port'], host=port_config['host'])
     producer.connect()
-    
+    logger = ConsoleLogger(name="producer").get_logger()
     
     while True:
         topics = input("Enter topics (comma separated) to publish to: ")
         msg = input("Enter message: ")
-        producer.publish(topics, msg) 
+        response = producer.publish(topics, msg) 
+        if 'error' in response:
+            logger.error(f"Error publishing message: {response['error']}")
+        else:
+            logger.info(f"Message published to topics: {topics}")
+
         cont = input("Do you want to continue? (y/n): ").strip().lower()
         if cont != 'y':
             break
