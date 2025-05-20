@@ -1,5 +1,5 @@
 import socket
-import pickle
+import json
 import time
 
 from logger.console_logger import ConsoleLogger
@@ -18,8 +18,11 @@ class Consumer:
 
     def consume(self, topic):
         request = {'action': 'poll', 'topic': topic}
-        self.sock.sendall(pickle.dumps(request))
-        response = pickle.loads(self.sock.recv(4096))
+        self.sock.sendall(json.dumps(request).encode('utf-8'))
+        data = self.sock.recv(4096)
+        if not data:
+            return None
+        response = json.loads(data.decode('utf-8'))
         return response.get('message')
 
 def main():

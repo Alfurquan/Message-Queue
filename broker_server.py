@@ -1,6 +1,6 @@
 import socket
 import threading
-import pickle
+import json
 from threading import Lock
 from broker.broker import Broker
 from logger.console_logger import ConsoleLogger
@@ -23,7 +23,7 @@ class BrokerServer:
                         self.logger.info(f"Connection closed by {addr}")
                         break
 
-                    request = pickle.loads(data)
+                    request = json.loads(data)
                     action = request.get('action')
                     topic = request.get('topic')
 
@@ -31,17 +31,17 @@ class BrokerServer:
                         message = request.get('message')
                         with self.lock:
                             self.broker.publish(topic, message)
-                        conn.sendall(pickle.dumps({'status': 'ok'}))
+                        conn.sendall(json.dumps({'status': 'ok'}).encode('utf-8'))
 
                     elif action == 'poll':
                         with self.lock:
                             msg = self.broker.poll(topic)
                         payload = msg.payload if msg else None
-                        conn.sendall(pickle.dumps({'message': payload}))
+                        conn.sendall(json.dumps({'message': payload}).encode('utf-8'))
 
                     else:
                         self.logger.warning(f"Unknown action '{action}' from {addr}")
-                        conn.sendall(pickle.dumps({'error': 'Unknown action'}))
+                        conn.sendall(json.dumps({'error': 'Unknown action'}).encode('utf-8'))
 
                 except Exception as e:
                     self.logger.error(f"Error handling client {addr}: {e}")
