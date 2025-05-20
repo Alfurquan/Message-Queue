@@ -58,18 +58,28 @@ class Broker:
             self.logger.info(f"Polled message from {topic_name}: {msg}")
         return msg
     
-    def subscribe(self, consumer_id: str, topic_name: str):
+    def subscribe(self, consumer_id: str, topic_name: str) -> str:
         """
         Subscribes a consumer to a topic.
         param consumer_id: The id of the consumer to subscribe.
         param topic_name: The name of the topic to subscribe to.
+        return: The name of the topic.
         """
         if topic_name not in self.topics:
             self.logger.error(f"Topic not found: {topic_name}")
-            return
+            return None
         
         if consumer_id not in self.subscribers:
             self.subscribers[consumer_id] = []
         
         self.subscribers[consumer_id].append(self.topics[topic_name])
         self.logger.info(f"Consumer {consumer_id} subscribed to topic {topic_name}.")
+        return topic_name
+
+    def has_topic(self, topic_name: str) -> bool:
+        """
+        Checks if a topic exists.
+        param topic_name: The name of the topic to check.
+        return: True if the topic exists, False otherwise.
+        """
+        return topic_name in self.topics

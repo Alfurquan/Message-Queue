@@ -46,7 +46,6 @@ def main():
     consumer.subscribe(topics=topics, consumer_id=consumer_id)
     while True:
         for topic in topics.split(','):
-            logger.info(f"Topic {topic}.")
             msg = consumer.consume(topic=topic, consumer_id=consumer_id)
             if msg:
                 logger.info(f"[RECEIVED] {msg}")
