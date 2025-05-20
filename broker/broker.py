@@ -1,6 +1,6 @@
 from typing import Dict
-from .topic import Topic
-from .message import Message
+from broker.topic import Topic
+from broker.message import Message
 from logger.logger import Logger
 
 class Broker:
@@ -37,7 +37,7 @@ class Broker:
             self.create_topic(topic_name)
         msg = Message.create(payload)
         self.topics[topic_name].publish(msg)
-        self.logger.info(f"Published message to {topic_name}: {msg}")
+        self.logger.info(f"Published message to topic {topic_name}: {msg}")
 
     def poll(self, topic_name: str) -> Message:
         """

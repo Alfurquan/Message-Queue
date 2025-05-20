@@ -1,6 +1,5 @@
 from queue import Queue
-from typing import Dict
-from .message import Message
+from broker.message import Message
 from logger.logger import Logger
 
 class Topic:

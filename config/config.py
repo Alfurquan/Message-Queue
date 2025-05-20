@@ -1,5 +1,5 @@
 """
-Configuration module for the logger service.
+Configuration module for the message queue.
 """
 import os
 
@@ -28,11 +28,22 @@ DEFAULT_LOG_CONFIG = {
     "file_format": "{timestamp} | {level} | {message}",
 }
 
+DEFAULT_PORT_CONFIG = {
+    "port": int(os.environ.get("PORT", 5000)),
+    "host": os.environ.get("HOST", "localhost"),
+}
+
 def get_log_config():
     """
     Returns the current log configuration.
     """
     return DEFAULT_LOG_CONFIG
+
+def get_port_config():
+    """
+    Returns the current port configuration.
+    """
+    return DEFAULT_PORT_CONFIG
 
 def get_log_level_value(level_name):
     """Converts a log level name to its numeric value."""
