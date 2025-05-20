@@ -1,5 +1,5 @@
 from queue import Queue
-from broker.message import Message
+from core.message import Message
 from logger.logger import Logger
 
 class Topic:

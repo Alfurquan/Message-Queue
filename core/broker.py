@@ -1,6 +1,6 @@
 from typing import Dict, List
-from broker.topic import Topic
-from broker.message import Message
+from core.topic import Topic
+from core.message import Message
 from logger.logger import Logger
 
 class Broker:
