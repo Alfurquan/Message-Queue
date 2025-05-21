@@ -10,11 +10,3 @@ class Storage(ABC):
     @abstractmethod
     def load(self, key: str) -> Any:
         pass
-
-    @abstractmethod
-    def append(self, key: str, item: Any) -> None:
-        pass
-
-    @abstractmethod
-    def load_all(self, key: str) -> List[Any]:
-        pass

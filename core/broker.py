@@ -23,9 +23,9 @@ class Broker:
         self.subscribers: Dict[str, set[str]] = {}
         self.consumer_groups: Dict[str, str] = {}
 
-        self.load_state()
+        self._load_state()
 
-    def load_state(self):
+    def _load_state(self):
         """
         Loads the entire state from persistence: topics, subscribers, consumer groups.
         """
@@ -48,25 +48,38 @@ class Broker:
 
         self.logger.info(f"Loaded state with topics: {list(self.topics.keys())}")
 
-    def save_state(self):
+    def _save_topic_list(self):
         """
-        Saves the entire broker state to persistence: topics, subscribers, consumer groups.
+        Saves the list of topic names.
         """
-        # Save topic list
         self.persistence.save_topics(list(self.topics.keys()))
 
-        # Save subscribers and consumer groups per topic
+    def _save_subscribers(self):
+        """
+        Saves subscribers per topic.
+        """
         for topic_name in self.topics.keys():
-            # Gather all subscribers subscribed to this topic
-            topic_subscribers = [cid for cid, topics in self.subscribers.items() if topic_name in topics]
-
-            # Gather consumer groups for subscribers of this topic
-            topic_consumer_groups = {cid: self.consumer_groups[cid] for cid in topic_subscribers if cid in self.consumer_groups}
-
+            topic_subscribers = [
+                cid for cid, topics in self.subscribers.items()
+                if topic_name in topics
+            ]
             self.persistence.save_subscribers(topic_name, topic_subscribers)
+
+    def _save_consumer_groups(self):
+        """
+        Saves consumer groups per topic (based on topic's subscribers).
+        """
+        for topic_name in self.topics.keys():
+            topic_subscribers = [
+                cid for cid, topics in self.subscribers.items()
+                if topic_name in topics
+            ]
+            topic_consumer_groups = {
+                cid: self.consumer_groups[cid]
+                for cid in topic_subscribers if cid in self.consumer_groups
+            }
             self.persistence.save_consumer_groups(topic_name, topic_consumer_groups)
 
-        self.logger.info("Saved broker state.")
 
     def create_topic(self, name: str) -> Topic:
         """
@@ -78,7 +91,7 @@ class Broker:
             topic = Topic(name, self.logger, self.persistence)
             self.topics[name] = topic
             self.logger.info(f"Topic {name} created.")
-            self.save_state()  # Save after topic creation
+            self._save_topic_list()
             return topic
         else:
             self.logger.warning(f"Topic {name} already exists.")
@@ -143,7 +156,8 @@ class Broker:
 
         self.logger.info(f"Consumer {consumer_id} subscribed to topic {topic_name} in group {group}.")
 
-        self.save_state()
+        self._save_subscribers()
+        self._save_consumer_groups()
 
         return topic_name
 
