@@ -1,16 +1,17 @@
 import socket
 import threading
 import logging
+from persistence.file_storage import FileStorage
+from persistence.persistence import Persistence
 from server.json_socket import JsonSocket
 from server.request_handler import RequestHandler
 from core.broker import Broker
 
 class Server:
     def __init__(self, logger, host='localhost', port=5000):
-        self.broker = Broker(logger)
         self.logger = logger
         self.logger.setLevel(logging.INFO)
-        self.handler = RequestHandler(self.broker, self.logger)
+        self.handler = RequestHandler(Broker(logger = logger, persistence = Persistence(FileStorage())), self.logger)
         self.host = host
         self.port = port
 

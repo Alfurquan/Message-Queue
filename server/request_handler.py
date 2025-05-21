@@ -39,6 +39,9 @@ class RequestHandler:
     def _handle_subscribe(self, request):
         topics = request.get("topics", "")
         consumer_id = request.get("consumer_id")
+        consumer_group = request.get("consumer_group")
+        if not consumer_group:
+            consumer_group = "Default"
         if not topics or not consumer_id:
             return {"error": "Missing 'topics' or 'consumer_id'"}
 
@@ -47,7 +50,7 @@ class RequestHandler:
             for topic in topic_list:
                 if not self.broker.has_topic(topic):
                     return {"error": f"Topic '{topic}' not found"}
-                self.broker.subscribe(consumer_id, topic)
+                self.broker.subscribe(consumer_id, topic, consumer_group)
 
         return {"status": "ok"}
 
