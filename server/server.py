@@ -1,8 +1,8 @@
 import socket
 import threading
 import logging
-from interfaces.json_socket import JsonSocket
-from interfaces.request_handler import RequestHandler
+from server.json_socket import JsonSocket
+from server.request_handler import RequestHandler
 from core.broker import Broker
 
 class Server:
