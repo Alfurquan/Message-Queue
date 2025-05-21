@@ -1,13 +1,9 @@
-import socket
-import json
 
 from logger.console_logger import ConsoleLogger
-from config.config import get_port_config
 from interfaces.producer import Producer
 
 def main():
-    port_config = get_port_config()
-    producer = Producer(port=port_config['port'], host=port_config['host'])
+    producer = Producer.connect()
     producer.connect()
     logger = ConsoleLogger(name="producer").get_logger()
     

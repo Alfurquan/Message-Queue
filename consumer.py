@@ -1,17 +1,12 @@
-import socket
-import json
 import time
 import uuid
 
 from logger.console_logger import ConsoleLogger
-from config.config import get_port_config
 from interfaces.consumer import Consumer
 
 
 def main():
-    port_config = get_port_config()
-    consumer = Consumer(host=port_config['host'], port=port_config['port'])
-    consumer.connect()
+    consumer = Consumer.connect()
     logger = ConsoleLogger(name="consumer").get_logger()
     topics = input("Enter topics (comma separated) to subscribe to: ")
     consumer_id = str(uuid.uuid4())
