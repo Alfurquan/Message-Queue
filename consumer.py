@@ -1,5 +1,4 @@
 import time
-import uuid
 
 from logger.console_logger import ConsoleLogger
 from interfaces.consumer import Consumer
@@ -9,9 +8,8 @@ def main():
     consumer = Consumer.connect()
     logger = ConsoleLogger(name="consumer").get_logger()
     topics = input("Enter topics (comma separated) to subscribe to: ")
-    consumer_id = str(uuid.uuid4())
 
-    response = consumer.subscribe(topics=topics, consumer_id=consumer_id)
+    response = consumer.subscribe(topics=topics)
 
     if 'error' in response:
         logger.error(f"Error subscribing to topics: {response['error']}")
@@ -20,7 +18,7 @@ def main():
 
     while True:
         for topic in topics.split(','):
-            response = consumer.consume(topic=topic, consumer_id=consumer_id)
+            response = consumer.consume(topic=topic)
             if 'error' in response:
                 logger.error(f"Error consuming message: {response['error']}")
                 continue
