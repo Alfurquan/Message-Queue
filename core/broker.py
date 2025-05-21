@@ -20,7 +20,7 @@ class Broker:
         self.topics: Dict[str, Topic] = {}
         self.logger = logger
         self.persistence = persistence
-        self.subscribers: Dict[str, List[str]] = {}
+        self.subscribers: Dict[str, set[str]] = {}
         self.consumer_groups: Dict[str, str] = {}
 
         self.load_state()
@@ -38,9 +38,9 @@ class Broker:
             # Load subscribers for this topic
             topic_subscribers = self.persistence.load_subscribers(name)
             for consumer_id in topic_subscribers:
-                self.subscribers.setdefault(consumer_id, [])
+                self.subscribers.setdefault(consumer_id, set())
                 if name not in self.subscribers[consumer_id]:
-                    self.subscribers[consumer_id].append(name)
+                    self.subscribers[consumer_id].add(name)
 
             # Load consumer groups for this topic (dict: consumer_id -> group)
             topic_consumer_groups = self.persistence.load_consumer_groups(name) or {}
@@ -113,6 +113,11 @@ class Broker:
             self.logger.error(f"Consumer {consumer_id} is not part of any group.")
             return None
         
+        topic_subscribers = [cid for cid, topics in self.subscribers.items() if topic_name in topics]
+        if consumer_id not in topic_subscribers:
+            self.logger.error(f"Consumer {consumer_id} is not subscribed to topic {topic_name}.")
+            return None
+
         msg = self.topics[topic_name].poll(group, consumer_id)
         if msg:
             self.logger.info(f"Polled message from {topic_name} for consumer {consumer_id}: {msg}")
@@ -130,9 +135,9 @@ class Broker:
             self.logger.error(f"Topic not found: {topic_name}")
             return None
 
-        self.subscribers.setdefault(consumer_id, [])
+        self.subscribers.setdefault(consumer_id, set())
         if topic_name not in self.subscribers[consumer_id]:
-            self.subscribers[consumer_id].append(topic_name)
+            self.subscribers[consumer_id].add(topic_name)
 
         self.consumer_groups[consumer_id] = group
 
